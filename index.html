@@ -115,6 +115,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .date-options-label { font-size: 11.5px; font-weight: 600; color: var(--hint); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; display: block; }
 .date-options-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
 .date-option-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; }
+.date-row-num { font-size: 12px; font-weight: 600; color: var(--hint); text-align: right; }
 .date-option-row input, .date-option-row select {
   padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px;
   font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
@@ -347,9 +348,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       </div>
       <hr class="section-divider">
       <div class="date-options-section">
-        <span class="date-options-label">Gewünschte Termine (mehrere möglich)</span>
+        <span class="date-options-label">Gewünschte Termine (bis zu 3 möglich)</span>
         <div class="date-options-list" id="date-options-list"></div>
-        <button class="btn-add-date" onclick="addDateOption()">+ Weiteren Termin hinzufügen</button>
+        <button class="btn-add-date" id="btn-add-date" onclick="addDateOption()">+ Weiteren Termin hinzufügen</button>
         <div class="open-date-row" style="margin-top:8px;">
           <input type="checkbox" id="inp-open-date">
           <label for="inp-open-date" style="font-size:13px;cursor:pointer;">Flexibles Datum (Termin noch offen)</label>
@@ -478,7 +479,6 @@ async function sbFetch(path, options = {}) {
 let fahrten = [];
 let currentFilter = 'alle';
 let waTextToCopy = '';
-let dateRowCount = 0;
 const PAGE_URL = window.location.href;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -498,19 +498,33 @@ function hideLoading() {
 async function loadFahrten() {
   try {
     const data = await sbFetch(`${TABLE}?order=created_at.desc&select=*`);
-    fahrten = (data || []).map(row => ({
-      id:          row.id,
-      name:        row.name || '',
-      anzahl:      row.anzahl || 1,
-      tel:         row.tel || '',
-      hinweis:     row.hinweis || '',
-      datum:       row.datum || '',
-      uhrzeit:     row.uhrzeit || '',
-      dateOptions: row.date_options || [],
-      openDate:    row.open_date || false,
-      status:      row.status || 'frei',
-      fahrer:      row.fahrer || ''
-    }));
+    fahrten = (data || []).map(row => {
+      const dateOptions = [];
+      if (row.datum_1) dateOptions.push({ date: row.datum_1, time: row.uhrzeit_1 || '' });
+      if (row.datum_2) dateOptions.push({ date: row.datum_2, time: row.uhrzeit_2 || '' });
+      if (row.datum_3) dateOptions.push({ date: row.datum_3, time: row.uhrzeit_3 || '' });
+      // fallback for old records that used date_options JSON
+      const legacyOptions = row.date_options || [];
+      return {
+        id:          row.id,
+        name:        row.name || '',
+        anzahl:      row.anzahl || 1,
+        tel:         row.tel || '',
+        hinweis:     row.hinweis || '',
+        datum:       row.datum_1 || row.datum || '',
+        uhrzeit:     row.uhrzeit_1 || row.uhrzeit || '',
+        datum_1:     row.datum_1 || '',
+        uhrzeit_1:   row.uhrzeit_1 || '',
+        datum_2:     row.datum_2 || '',
+        uhrzeit_2:   row.uhrzeit_2 || '',
+        datum_3:     row.datum_3 || '',
+        uhrzeit_3:   row.uhrzeit_3 || '',
+        dateOptions: dateOptions.length > 0 ? dateOptions : legacyOptions,
+        openDate:    row.open_date || false,
+        status:      row.status || 'frei',
+        fahrer:      row.fahrer || ''
+      };
+    });
     await syncDoneStatus();
     render();
     hideLoading();
@@ -525,7 +539,7 @@ async function syncDoneStatus() {
   const today = new Date(); today.setHours(0,0,0,0);
   const toMark = fahrten.filter(f => {
     if (f.status === 'done') return false;
-    const checkDate = f.datum || (f.dateOptions && f.dateOptions[0] && f.dateOptions[0].date);
+    const checkDate = f.datum_1 || f.datum;
     if (!checkDate) return false;
     const rd = new Date(checkDate); rd.setHours(0,0,0,0);
     return (today - rd) / 86400000 >= 1;
@@ -540,16 +554,21 @@ async function insertFahrt(fahrt) {
   return await sbFetch(TABLE, {
     method: 'POST',
     body: JSON.stringify({
-      name:         fahrt.name,
-      anzahl:       fahrt.anzahl,
-      tel:          fahrt.tel,
-      hinweis:      fahrt.hinweis,
-      datum:        fahrt.datum,
-      uhrzeit:      fahrt.uhrzeit,
-      date_options: fahrt.dateOptions,
-      open_date:    fahrt.openDate,
-      status:       'frei',
-      fahrer:       ''
+      name:      fahrt.name,
+      anzahl:    fahrt.anzahl,
+      tel:       fahrt.tel,
+      hinweis:   fahrt.hinweis,
+      datum:     fahrt.datum_1 || '',
+      uhrzeit:   fahrt.uhrzeit_1 || '',
+      datum_1:   fahrt.datum_1 || '',
+      uhrzeit_1: fahrt.uhrzeit_1 || '',
+      datum_2:   fahrt.datum_2 || '',
+      uhrzeit_2: fahrt.uhrzeit_2 || '',
+      datum_3:   fahrt.datum_3 || '',
+      uhrzeit_3: fahrt.uhrzeit_3 || '',
+      open_date: fahrt.openDate,
+      status:    'frei',
+      fahrer:    ''
     })
   });
 }
@@ -580,15 +599,18 @@ function toggleForm() {
   if (isOpen && document.getElementById('date-options-list').children.length === 0) addDateOption();
 }
 
+let dateRowCount = 0;
+
 function addDateOption() {
   const list = document.getElementById('date-options-list');
-  const id = ++dateRowCount;
+  if (list.children.length >= 3) return; // cap at 3
+  const n = ++dateRowCount;
   const div = document.createElement('div');
   div.className = 'date-option-row';
-  div.id = 'date-row-' + id;
+  div.id = 'date-row-' + n;
   div.innerHTML = `
-    <input type="date" id="date-d-${id}">
-    <select id="date-t-${id}">
+    <input type="date" id="date-d-${n}">
+    <select id="date-t-${n}">
       <option value="">Uhrzeit offen</option>
       <option value="Vormittags">Vormittags</option>
       <option value="Nachmittags">Nachmittags</option>
@@ -602,47 +624,57 @@ function addDateOption() {
       <option value="16:00">16:00 Uhr</option>
       <option value="17:00">17:00 Uhr</option>
     </select>
-    <button class="btn-remove-date" onclick="removeDateRow(${id})">×</button>`;
+    <button class="btn-remove-date" onclick="removeDateRow(${n})">×</button>`;
   list.appendChild(div);
+  // hide add button once 3 rows exist
+  const btn = document.getElementById('btn-add-date');
+  if (btn) btn.style.display = list.children.length >= 3 ? 'none' : '';
 }
 
-function removeDateRow(id) {
-  const row = document.getElementById('date-row-' + id);
+function removeDateRow(n) {
+  const row = document.getElementById('date-row-' + n);
   if (row) row.remove();
-}
-
-function collectDateOptions() {
-  const rows = document.querySelectorAll('#date-options-list .date-option-row');
-  const opts = [];
-  rows.forEach(row => {
-    const n = row.id.replace('date-row-', '');
-    const date = document.getElementById('date-d-' + n)?.value;
-    const time = document.getElementById('date-t-' + n)?.value;
-    if (date) opts.push({ date, time });
-  });
-  return opts;
+  const btn = document.getElementById('btn-add-date');
+  if (btn) btn.style.display = '';
 }
 
 async function addFahrt() {
-  const name    = document.getElementById('inp-name').value.trim();
-  const anzahl  = parseInt(document.getElementById('inp-anzahl').value);
-  const tel     = document.getElementById('inp-tel').value.trim();
-  const hinweis = document.getElementById('inp-hinweise').value.trim();
-  const openDate= document.getElementById('inp-open-date').checked;
-  const dateOptions = collectDateOptions();
+  const name     = document.getElementById('inp-name').value.trim();
+  const anzahl   = parseInt(document.getElementById('inp-anzahl').value);
+  const tel      = document.getElementById('inp-tel').value.trim();
+  const hinweis  = document.getElementById('inp-hinweise').value.trim();
+  const openDate = document.getElementById('inp-open-date').checked;
+
+  // Collect up to 3 date rows in order
+  const rows = document.querySelectorAll('#date-options-list .date-option-row');
+  const dates = [];
+  rows.forEach(row => {
+    const n = row.id.replace('date-row-', '');
+    const d = document.getElementById('date-d-' + n)?.value || '';
+    const t = document.getElementById('date-t-' + n)?.value || '';
+    dates.push({ date: d, time: t });
+  });
+
+  const datum_1   = dates[0]?.date || '';
+  const uhrzeit_1 = dates[0]?.time || '';
+  const datum_2   = dates[1]?.date || '';
+  const uhrzeit_2 = dates[1]?.time || '';
+  const datum_3   = dates[2]?.date || '';
+  const uhrzeit_3 = dates[2]?.time || '';
 
   if (!name) { alert('Bitte den Namen des Fahrgasts eingeben.'); return; }
-  // Allow saving if either at least one date is filled OR flexible is checked
-  if (dateOptions.length === 0 && !openDate) {
+  if (!datum_1 && !openDate) {
     alert('Bitte mindestens einen Wunschtermin eintragen oder "Flexibles Datum" auswählen.');
     return;
   }
 
-  // If flexible is checked but dates also exist, keep both — they are independent
-  const primaryDatum   = dateOptions.length > 0 ? dateOptions[0].date : '';
-  const primaryUhrzeit = dateOptions.length > 0 ? dateOptions[0].time : '';
+  // Build dateOptions array for card display
+  const dateOptions = dates.filter(d => d.date);
 
-  const fahrt = { name, anzahl, tel, hinweis, datum: primaryDatum, uhrzeit: primaryUhrzeit, dateOptions, openDate };
+  const fahrt = { name, anzahl, tel, hinweis,
+    datum: datum_1, uhrzeit: uhrzeit_1,
+    datum_1, uhrzeit_1, datum_2, uhrzeit_2, datum_3, uhrzeit_3,
+    dateOptions, openDate };
 
   const btn = document.getElementById('btn-save-fahrt');
   btn.disabled = true;
@@ -655,14 +687,14 @@ async function addFahrt() {
     render();
 
     // Reset form
-    document.getElementById('inp-name').value = '';
-    document.getElementById('inp-tel').value = '';
-    document.getElementById('inp-hinweise').value = '';
+    ['inp-name','inp-tel','inp-hinweise'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('inp-open-date').checked = false;
     document.getElementById('inp-anzahl').value = '1';
     document.getElementById('date-options-list').innerHTML = '';
     dateRowCount = 0;
     addDateOption();
+    const addBtn = document.getElementById('btn-add-date');
+    if (addBtn) addBtn.style.display = '';
     document.getElementById('form-body').classList.remove('open');
     document.getElementById('form-toggle').classList.remove('open');
 
