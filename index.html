@@ -314,7 +314,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
   <div class="header">
     <h1>🚲 Rikscha — Fahrten</h1>
-    <p>Fahrtenverwaltung &nbsp;·&nbsp; Freiwilliges Team</p>
+    <p>Fahrtenverwaltung</p>
     <div class="accent-line"></div>
   </div>
 
@@ -395,7 +395,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <option value="default">Standard (Frei → Vergeben → Erledigt)</option>
       <option value="date-asc">Datum aufsteigend ↑</option>
       <option value="date-desc">Datum absteigend ↓</option>
-      <option value="status">Nach Status</option>
     </select>
   </div>
 
@@ -633,11 +632,13 @@ async function addFahrt() {
   const dateOptions = collectDateOptions();
 
   if (!name) { alert('Bitte den Namen des Fahrgasts eingeben.'); return; }
+  // Allow saving if either at least one date is filled OR flexible is checked
   if (dateOptions.length === 0 && !openDate) {
     alert('Bitte mindestens einen Wunschtermin eintragen oder "Flexibles Datum" auswählen.');
     return;
   }
 
+  // If flexible is checked but dates also exist, keep both — they are independent
   const primaryDatum   = dateOptions.length > 0 ? dateOptions[0].date : '';
   const primaryUhrzeit = dateOptions.length > 0 ? dateOptions[0].time : '';
 
@@ -882,15 +883,18 @@ function render() {
     const isDone = fahrt.status==='done';
     const isFrei = fahrt.status==='frei';
 
-    let datePills = (fahrt.dateOptions||[]).map(o =>
-      `<span class="date-pill">${formatDate(o.date)}${o.time ? ' · ' + o.time : ''}</span>`
-    ).join('');
+    // Date pills — dateOptions and openDate are fully independent
+    let datePills = (fahrt.dateOptions||[])
+      .filter(o => o.date)
+      .map(o => `<span class="date-pill">${formatDate(o.date)}${o.time ? ' · ' + o.time : ''}</span>`)
+      .join('');
     if (fahrt.openDate) datePills += `<span class="date-pill open">🗓 Flexibles Datum</span>`;
 
     const anzahlText = fahrt.anzahl > 1 ? `👥 ${fahrt.anzahl} Personen` : `👤 1 Person`;
 
     const actionsHtml = isDone
       ? `<span style="font-size:12.5px;color:var(--hint);font-style:italic;">Automatisch als erledigt markiert</span>
+         <button class="btn-sm edit" id="edit-btn-${fahrt.id}" onclick="toggleEdit(${fahrt.id})">Bearbeiten</button>
          <button class="btn-sm danger" onclick="deleteFahrt(${fahrt.id})">Löschen</button>`
       : isFrei
       ? `<input class="assign-input" id="fahrer-${fahrt.id}" type="text" placeholder="Deinen Namen eingeben">
