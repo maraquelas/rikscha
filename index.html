@@ -15,325 +15,154 @@
   --text: #1c1a16;
   --muted: #7a7469;
   --hint: #b0aa9f;
-
   --frei: #8a6200;
   --frei-bg: #fff8e1;
   --frei-border: #f0d060;
-
   --vergeben: #2d6a4f;
   --vergeben-bg: #e8f5ee;
   --vergeben-border: #7ec8a0;
-
   --done: #6b6b6b;
   --done-bg: #f0efed;
   --done-border: #c8c4bc;
-
   --accent: #c8a96e;
   --radius: 10px;
   --radius-lg: 16px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.6; }
 .app { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
 
-/* ── REFRESH BANNER ── */
+/* LOADING OVERLAY */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 999;
+  gap: 14px;
+  transition: opacity 0.4s;
+}
+.loading-overlay.hidden { opacity: 0; pointer-events: none; }
+.loading-spinner {
+  font-size: 36px;
+  animation: spin 1.2s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 14px; color: var(--muted); }
+
+/* REFRESH BANNER */
 .refresh-banner {
   background: #fffbf2;
   color: var(--text);
   border: 2px solid var(--accent);
   border-radius: var(--radius-lg);
   padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; margin-bottom: 1.5rem;
   box-shadow: 0 2px 12px rgba(200,169,110,0.18);
 }
-.refresh-banner-text { flex: 1; }
-.refresh-banner-text strong {
-  font-size: 15px;
-  font-weight: 600;
-  display: block;
-  margin-bottom: 2px;
-  color: var(--text);
-}
+.refresh-banner-text strong { font-size: 15px; font-weight: 600; display: block; margin-bottom: 2px; }
 .refresh-banner-text span { font-size: 12px; color: var(--muted); }
-
 @keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  15%       { transform: rotate(-4deg); }
-  30%       { transform: rotate(4deg); }
-  45%       { transform: rotate(-3deg); }
-  60%       { transform: rotate(3deg); }
-  75%       { transform: rotate(-1deg); }
+  0%,100% { transform: rotate(0deg); }
+  15% { transform: rotate(-4deg); }
+  30% { transform: rotate(4deg); }
+  45% { transform: rotate(-3deg); }
+  60% { transform: rotate(3deg); }
+  75% { transform: rotate(-1deg); }
 }
 .btn-refresh {
-  padding: 11px 22px;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  letter-spacing: 0.02em;
+  padding: 11px 22px; background: var(--accent); color: #fff; border: none;
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 700; cursor: pointer; white-space: nowrap; letter-spacing: 0.02em;
   animation: wiggle 2.4s ease-in-out infinite;
-  transition: opacity 0.15s, transform 0.1s;
 }
-.btn-refresh:hover { opacity: 0.88; animation: none; transform: scale(1.03); }
-.btn-refresh:active { transform: scale(0.97); }
+.btn-refresh:hover { opacity: 0.88; animation: none; }
 
-/* ── HEADER ── */
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-}
-.header h1 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: -0.5px;
-  margin-bottom: 4px;
-}
+/* HEADER */
+.header { text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+.header h1 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; letter-spacing: -0.5px; margin-bottom: 4px; }
 .header p { color: var(--muted); font-size: 13px; }
 .accent-line { width: 40px; height: 2px; background: var(--accent); margin: 10px auto 0; border-radius: 2px; }
 
-/* ── COLLAPSIBLE FORM ── */
-.form-section {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-}
+/* FORM */
+.form-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 1.5rem; overflow: hidden; }
 .form-toggle {
-  width: 100%;
-  padding: 15px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: 0.03em;
+  width: 100%; padding: 15px 20px; display: flex; align-items: center;
+  justify-content: space-between; background: none; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--text);
 }
 .form-toggle:hover { background: #faf8f5; }
 .toggle-chevron {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  color: var(--muted);
-  transition: transform 0.25s ease, background 0.15s;
-  flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 50%; background: var(--bg);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--muted); transition: transform 0.25s ease, background 0.15s; flex-shrink: 0;
 }
 .form-toggle.open .toggle-chevron { transform: rotate(180deg); background: var(--text); color: #fff; border-color: var(--text); }
-
-.form-body {
-  border-top: 1px solid var(--border);
-  padding: 1.2rem 1.4rem 1.4rem;
-  display: none;
-}
+.form-body { border-top: 1px solid var(--border); padding: 1.2rem 1.4rem 1.4rem; display: none; }
 .form-body.open { display: block; }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 .form-field { display: flex; flex-direction: column; gap: 5px; }
-.form-field label {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--hint);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+.form-field label { font-size: 11.5px; font-weight: 600; color: var(--hint); text-transform: uppercase; letter-spacing: 0.07em; }
+.form-field input, .form-field select {
+  padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+  background: var(--bg); outline: none; transition: border-color 0.15s;
 }
-.form-field input,
-.form-field select {
-  padding: 10px 13px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
-  transition: border-color 0.15s;
-}
-.form-field input:focus,
-.form-field select:focus { border-color: var(--accent); }
+.form-field input:focus, .form-field select:focus { border-color: var(--accent); }
 .form-field.full { grid-column: 1 / -1; }
-
-/* Date options */
 .date-options-section { margin-bottom: 12px; }
-.date-options-label {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--hint);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 8px;
-  display: block;
-}
+.date-options-label { font-size: 11.5px; font-weight: 600; color: var(--hint); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; display: block; }
 .date-options-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-.date-option-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 8px;
-  align-items: center;
+.date-option-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; }
+.date-option-row input, .date-option-row select {
+  padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+  background: var(--bg); outline: none; width: 100%;
 }
-.date-option-row input {
-  padding: 9px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13.5px;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
-  transition: border-color 0.15s;
-  width: 100%;
-}
-.date-option-row input:focus { border-color: var(--accent); }
-.date-option-row select {
-  padding: 9px 10px;
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
-  width: 100%;
-}
+.date-option-row input:focus, .date-option-row select:focus { border-color: var(--accent); }
 .btn-remove-date {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: transparent;
-  color: var(--hint);
-  font-size: 16px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.15s;
+  width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: transparent; color: var(--hint); font-size: 16px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s;
 }
 .btn-remove-date:hover { border-color: #c03030; color: #c03030; background: #fff0f0; }
-
 .btn-add-date {
-  padding: 8px 14px;
-  border: 1.5px dashed var(--border2);
-  border-radius: 8px;
-  background: transparent;
-  color: var(--muted);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  width: 100%;
-  text-align: left;
+  padding: 8px 14px; border: 1.5px dashed var(--border2); border-radius: 8px;
+  background: transparent; color: var(--muted); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; width: 100%; text-align: left;
 }
 .btn-add-date:hover { border-color: var(--accent); color: var(--accent); background: #fffbf2; }
-
 .open-date-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: var(--frei-bg);
-  border: 1px solid var(--frei-border);
-  border-radius: 8px;
-  font-size: 13px;
-  color: var(--frei);
-  margin-top: 6px;
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--frei-bg); border: 1px solid var(--frei-border); border-radius: 8px;
+  font-size: 13px; color: var(--frei); margin-top: 6px;
 }
-.open-date-row input[type="checkbox"] {
-  width: 17px; height: 17px;
-  cursor: pointer;
-  accent-color: var(--frei);
-  flex-shrink: 0;
-}
-
-.section-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 14px 0;
-}
-
+.open-date-row input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: var(--frei); flex-shrink: 0; }
+.section-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
 .btn-add {
-  width: 100%;
-  padding: 13px;
-  background: var(--text);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.15s;
+  width: 100%; padding: 13px; background: var(--text); color: #fff; border: none;
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
 }
 .btn-add:hover { opacity: 0.85; }
+.btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── STATS SECTION ── */
+/* STATS */
 .stats-section { margin-bottom: 1.5rem; }
-.stats-header { margin-bottom: 6px; }
-.stats-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 17px;
-  font-weight: 400;
-  color: var(--text);
-  margin-bottom: 3px;
-}
+.stats-title { font-family: 'DM Serif Display', serif; font-size: 17px; font-weight: 400; color: var(--text); margin-bottom: 3px; }
 .stats-hint { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 .stats { display: flex; gap: 10px; margin-top: 12px; }
 .stat {
-  flex: 1;
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: border-color 0.2s, transform 0.12s, box-shadow 0.2s;
-  user-select: none;
+  flex: 1; background: var(--card); border: 2px solid var(--border); border-radius: var(--radius-lg);
+  padding: 14px 10px; text-align: center; cursor: pointer;
+  transition: border-color 0.2s, transform 0.12s, box-shadow 0.2s; user-select: none;
 }
 .stat:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.07); }
 .stat.active-filter.alle     { border-color: var(--text); box-shadow: 0 4px 14px rgba(28,26,22,0.12); }
 .stat.active-filter.frei     { border-color: var(--frei-border); background: var(--frei-bg); }
 .stat.active-filter.vergeben { border-color: var(--vergeben-border); background: var(--vergeben-bg); }
 .stat.active-filter.done     { border-color: var(--done-border); background: var(--done-bg); }
-.stat-num {
-  font-family: 'DM Serif Display', serif;
-  font-size: 30px;
-  font-weight: 400;
-  line-height: 1;
-  margin-bottom: 5px;
-}
+.stat-num { font-family: 'DM Serif Display', serif; font-size: 30px; font-weight: 400; line-height: 1; margin-bottom: 5px; }
 .stat-num.total    { color: var(--text); }
 .stat-num.frei     { color: var(--frei); }
 .stat-num.vergeben { color: var(--vergeben); }
@@ -341,154 +170,60 @@ body {
 .stat-label-sm { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
 .stat-tap-hint { font-size: 10px; color: var(--hint); margin-top: 4px; }
 
-/* ── SORT BAR ── */
-.sort-bar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-bottom: 1.1rem;
-}
+/* SORT */
+.sort-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 1.1rem; }
 .sort-label { font-size: 12px; color: var(--muted); }
 .sort-select {
-  padding: 8px 12px;
-  border: 1.5px solid var(--border2);
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  color: var(--text);
-  background: var(--card);
-  outline: none;
-  cursor: pointer;
-  transition: border-color 0.15s;
+  padding: 8px 12px; border: 1.5px solid var(--border2); border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text);
+  background: var(--card); outline: none; cursor: pointer;
 }
 .sort-select:focus { border-color: var(--accent); }
 
-/* ── TRIP CARDS ── */
+/* TRIP CARDS */
 .trips-list { display: flex; flex-direction: column; gap: 10px; }
 .trip-card {
-  background: var(--card);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px 16px;
-  transition: box-shadow 0.15s;
-  border-left-width: 5px;
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius-lg);
+  padding: 14px 16px; transition: box-shadow 0.15s; border-left-width: 5px;
 }
 .trip-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.07); }
 .trip-card.frei     { border-left-color: var(--frei-border); }
 .trip-card.vergeben { border-left-color: var(--vergeben-border); }
 .trip-card.done     { border-left-color: var(--done-border); opacity: 0.72; }
-
-.trip-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 9px;
-}
-.trip-name {
-  font-family: 'DM Serif Display', serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: -0.2px;
-}
+.trip-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+.trip-name { font-family: 'DM Serif Display', serif; font-size: 18px; font-weight: 400; letter-spacing: -0.2px; }
 .trip-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 20px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  border: 1px solid;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+  white-space: nowrap; flex-shrink: 0; border: 1px solid; letter-spacing: 0.04em; text-transform: uppercase;
 }
 .trip-badge.frei     { background: var(--frei-bg);     color: var(--frei);     border-color: var(--frei-border); }
 .trip-badge.vergeben { background: var(--vergeben-bg); color: var(--vergeben); border-color: var(--vergeben-border); }
 .trip-badge.done     { background: var(--done-bg);     color: var(--done);     border-color: var(--done-border); }
-
-.trip-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 11px;
-}
+.trip-info { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--muted); margin-bottom: 11px; }
 .trip-info span { display: flex; align-items: center; gap: 5px; }
-
-/* date option pills inside card */
-.trip-dates {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-.date-pill {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--frei-border);
-  background: var(--frei-bg);
-  color: var(--frei);
-  font-weight: 500;
-}
+.trip-dates { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.date-pill { font-size: 12px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--frei-border); background: var(--frei-bg); color: var(--frei); font-weight: 500; }
 .date-pill.open { border-color: var(--border2); background: var(--bg); color: var(--muted); font-style: italic; }
-
 .trip-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
 .assign-input {
-  flex: 1;
-  min-width: 130px;
-  padding: 9px 12px;
-  border: 1.5px solid var(--frei-border);
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  color: var(--text);
-  background: var(--frei-bg);
-  outline: none;
+  flex: 1; min-width: 130px; padding: 9px 12px; border: 1.5px solid var(--frei-border);
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text);
+  background: var(--frei-bg); outline: none;
 }
 .assign-input:focus { border-color: var(--frei); }
-
 .btn-take {
-  padding: 9px 16px;
-  background: var(--vergeben);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity 0.15s;
+  padding: 9px 16px; background: var(--vergeben); color: #fff; border: none;
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600;
+  cursor: pointer; white-space: nowrap;
 }
 .btn-take:hover { opacity: 0.85; }
-
-.driver-info {
-  background: var(--vergeben-bg);
-  border: 1px solid var(--vergeben-border);
-  border-radius: 8px;
-  padding: 8px 13px;
-  font-size: 13px;
-  color: var(--vergeben);
-  flex: 1;
-}
+.btn-take:disabled { opacity: 0.5; cursor: not-allowed; }
+.driver-info { background: var(--vergeben-bg); border: 1px solid var(--vergeben-border); border-radius: 8px; padding: 8px 13px; font-size: 13px; color: var(--vergeben); flex: 1; }
 .driver-info strong { font-weight: 600; }
-
 .btn-sm {
-  padding: 8px 13px;
-  background: transparent;
-  color: var(--muted);
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s;
+  padding: 8px 13px; background: transparent; color: var(--muted); border: 1.5px solid var(--border);
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; white-space: nowrap; transition: all 0.15s;
 }
 .btn-sm:hover { color: var(--text); border-color: var(--text); }
 .btn-sm.danger { color: #b03030; border-color: #e8c0c0; }
@@ -502,135 +237,47 @@ body {
 .edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .edit-field { display: flex; flex-direction: column; gap: 4px; }
 .edit-field label { font-size: 11px; font-weight: 600; color: var(--hint); text-transform: uppercase; letter-spacing: 0.06em; }
-.edit-field input,
-.edit-field select {
-  padding: 8px 11px;
-  border: 1.5px solid var(--border);
-  border-radius: 7px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13.5px;
-  color: var(--text);
-  background: var(--bg);
-  outline: none;
-  transition: border-color 0.15s;
+.edit-field input, .edit-field select {
+  padding: 8px 11px; border: 1.5px solid var(--border); border-radius: 7px;
+  font-family: 'DM Sans', sans-serif; font-size: 13.5px; color: var(--text); background: var(--bg); outline: none;
 }
 .edit-field input:focus, .edit-field select:focus { border-color: var(--accent); }
 .edit-field.full { grid-column: 1 / -1; }
 .edit-actions { display: flex; gap: 8px; justify-content: flex-end; }
-.btn-save {
-  padding: 9px 16px;
-  background: var(--text);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-}
+.btn-save { padding: 9px 16px; background: var(--text); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; }
 .btn-save:hover { opacity: 0.85; }
 
-/* ── MODALS ── */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  padding: 1rem;
-}
+/* MODALS */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 200; padding: 1rem; }
 .modal-overlay.open { display: flex; }
-.modal {
-  background: var(--card);
-  border-radius: 18px;
-  padding: 1.8rem;
-  max-width: 400px;
-  width: 100%;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.22);
-}
-.modal h3 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 22px;
-  font-weight: 400;
-  margin-bottom: 8px;
-}
+.modal { background: var(--card); border-radius: 18px; padding: 1.8rem; max-width: 400px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.22); }
+.modal h3 { font-family: 'DM Serif Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 8px; }
 .modal p { font-size: 13.5px; color: var(--muted); margin-bottom: 1.2rem; line-height: 1.65; }
 .modal-actions { display: flex; gap: 9px; justify-content: flex-end; flex-wrap: wrap; }
-
-/* WhatsApp share modal */
-.wa-preview {
-  background: #f0faf4;
-  border: 1px solid #a8dbb8;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 12.5px;
-  color: #1a4a2e;
-  margin-bottom: 1.2rem;
-  line-height: 1.8;
-  font-family: monospace;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.btn-wa {
-  padding: 10px 18px;
-  background: #25D366;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity 0.15s;
-}
+.wa-preview { background: #f0faf4; border: 1px solid #a8dbb8; border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: #1a4a2e; margin-bottom: 1.2rem; line-height: 1.8; font-family: monospace; white-space: pre-wrap; word-break: break-word; }
+.btn-wa { padding: 10px 18px; background: #25D366; color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 700; cursor: pointer; }
 .btn-wa:hover { opacity: 0.88; }
-.copy-confirm {
-  font-size: 12px;
-  color: var(--vergeben);
-  display: none;
-  margin-top: 6px;
-  text-align: center;
-}
+.copy-confirm { font-size: 12px; color: var(--vergeben); display: none; margin-top: 6px; text-align: center; }
 .copy-confirm.show { display: block; }
-
-/* Calendar modal */
-.cal-event-preview {
-  background: var(--vergeben-bg);
-  border: 1px solid var(--vergeben-border);
-  border-radius: 10px;
-  padding: 11px 14px;
-  font-size: 13px;
-  color: var(--vergeben);
-  margin-bottom: 1.2rem;
-  line-height: 1.7;
-}
+.cal-event-preview { background: var(--vergeben-bg); border: 1px solid var(--vergeben-border); border-radius: 10px; padding: 11px 14px; font-size: 13px; color: var(--vergeben); margin-bottom: 1.2rem; line-height: 1.7; }
 .cal-event-preview strong { font-weight: 600; font-size: 14px; display: block; margin-bottom: 4px; }
-.btn-cal {
-  padding: 9px 16px;
-  background: var(--vergeben);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-}
+.btn-cal { padding: 9px 16px; background: var(--vergeben); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600; cursor: pointer; }
 .btn-cal:hover { opacity: 0.85; }
 
-/* ── EMPTY / LEGEND ── */
+/* ERROR TOAST */
+.toast {
+  position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+  background: #c0392b; color: #fff; padding: 12px 20px; border-radius: 10px;
+  font-size: 13px; font-weight: 500; z-index: 500; opacity: 0;
+  transition: opacity 0.3s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* EMPTY / LEGEND */
 .empty { text-align: center; padding: 3.5rem 1rem; color: var(--hint); }
 .empty-icon { font-size: 40px; margin-bottom: 10px; }
 .empty p { font-size: 14px; }
-
-.legend {
-  display: flex;
-  gap: 18px;
-  justify-content: center;
-  margin-top: 2.5rem;
-  flex-wrap: wrap;
-}
+.legend { display: flex; gap: 18px; justify-content: center; margin-top: 2.5rem; flex-wrap: wrap; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 .legend-dot.frei     { background: var(--frei); }
@@ -648,9 +295,15 @@ body {
 </style>
 </head>
 <body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-spinner">🚲</div>
+  <div class="loading-text">Fahrten werden geladen…</div>
+</div>
+
 <div class="app">
 
-  <!-- ── REFRESH BANNER ── -->
   <div class="refresh-banner">
     <div class="refresh-banner-text">
       <strong>🔄 Zuerst aktualisieren!</strong>
@@ -659,22 +312,18 @@ body {
     <button class="btn-refresh" onclick="doRefresh()">Aktualisieren</button>
   </div>
 
-  <!-- ── HEADER ── -->
   <div class="header">
     <h1>🚲 Rikscha — Fahrten</h1>
     <p>Fahrtenverwaltung &nbsp;·&nbsp; Freiwilliges Team</p>
     <div class="accent-line"></div>
   </div>
 
-  <!-- ── COLLAPSIBLE FORM ── -->
   <div class="form-section">
     <button class="form-toggle" id="form-toggle" onclick="toggleForm()">
       <span>+ Neue Fahrt eintragen</span>
       <span class="toggle-chevron">▾</span>
     </button>
     <div class="form-body" id="form-body">
-
-      <!-- Passenger info -->
       <div class="form-grid">
         <div class="form-field">
           <label>Name des Fahrgasts</label>
@@ -696,51 +345,43 @@ body {
           <input type="text" id="inp-hinweise" placeholder="z.B. Marktplatz, Rollstuhl erforderlich">
         </div>
       </div>
-
       <hr class="section-divider">
-
-      <!-- Date options -->
       <div class="date-options-section">
         <span class="date-options-label">Gewünschte Termine (mehrere möglich)</span>
-        <div class="date-options-list" id="date-options-list">
-          <!-- rows added dynamically -->
-        </div>
+        <div class="date-options-list" id="date-options-list"></div>
         <button class="btn-add-date" onclick="addDateOption()">+ Weiteren Termin hinzufügen</button>
         <div class="open-date-row" style="margin-top:8px;">
           <input type="checkbox" id="inp-open-date">
           <label for="inp-open-date" style="font-size:13px;cursor:pointer;">Flexibles Datum (Termin noch offen)</label>
         </div>
       </div>
-
       <hr class="section-divider">
-
-      <button class="btn-add" onclick="addFahrt()">Fahrt speichern</button>
+      <button class="btn-add" id="btn-save-fahrt" onclick="addFahrt()">Fahrt speichern</button>
     </div>
   </div>
 
-  <!-- ── STATS ── -->
   <div class="stats-section">
     <div class="stats-header">
       <div class="stats-title">Aktive Fahrten im Überblick</div>
       <div class="stats-hint">Auf eine Kachel tippen, um nur die Fahrten dieses Status anzuzeigen.</div>
     </div>
     <div class="stats">
-      <div class="stat alle active-filter alle" id="stat-alle" onclick="setFilter('alle', this, 'alle')">
+      <div class="stat alle active-filter alle" id="stat-alle" onclick="setFilter('alle',this,'alle')">
         <div class="stat-num total" id="count-alle">0</div>
         <div class="stat-label-sm">Alle</div>
         <div class="stat-tap-hint">Tippen zum Filtern</div>
       </div>
-      <div class="stat" id="stat-frei" onclick="setFilter('frei', this, 'frei')">
+      <div class="stat" id="stat-frei" onclick="setFilter('frei',this,'frei')">
         <div class="stat-num frei" id="count-frei">0</div>
         <div class="stat-label-sm">🟡 Frei</div>
         <div class="stat-tap-hint">Tippen zum Filtern</div>
       </div>
-      <div class="stat" id="stat-vergeben" onclick="setFilter('vergeben', this, 'vergeben')">
+      <div class="stat" id="stat-vergeben" onclick="setFilter('vergeben',this,'vergeben')">
         <div class="stat-num vergeben" id="count-vergeben">0</div>
         <div class="stat-label-sm">🟢 Vergeben</div>
         <div class="stat-tap-hint">Tippen zum Filtern</div>
       </div>
-      <div class="stat" id="stat-done" onclick="setFilter('done', this, 'done')">
+      <div class="stat" id="stat-done" onclick="setFilter('done',this,'done')">
         <div class="stat-num done" id="count-done">0</div>
         <div class="stat-label-sm">⬜ Erledigt</div>
         <div class="stat-tap-hint">Tippen zum Filtern</div>
@@ -748,7 +389,6 @@ body {
     </div>
   </div>
 
-  <!-- ── SORT BAR ── -->
   <div class="sort-bar">
     <span class="sort-label">Sortieren:</span>
     <select class="sort-select" id="sort-select" onchange="render()">
@@ -766,10 +406,9 @@ body {
     <div class="legend-item"><div class="legend-dot vergeben"></div> Vergeben — Fahrer bestätigt</div>
     <div class="legend-item"><div class="legend-dot done"></div> Erledigt — automatisch nach Fahrtdatum</div>
   </div>
-
 </div>
 
-<!-- ── WHATSAPP SHARE MODAL ── -->
+<!-- WHATSAPP MODAL -->
 <div class="modal-overlay" id="modal-wa">
   <div class="modal">
     <h3>📲 In WhatsApp-Gruppe teilen</h3>
@@ -783,7 +422,7 @@ body {
   </div>
 </div>
 
-<!-- ── SAVE CHANGES MODAL ── -->
+<!-- SAVE CHANGES MODAL -->
 <div class="modal-overlay" id="modal-save">
   <div class="modal">
     <h3>Änderungen speichern?</h3>
@@ -795,7 +434,7 @@ body {
   </div>
 </div>
 
-<!-- ── CALENDAR MODAL ── -->
+<!-- CALENDAR MODAL -->
 <div class="modal-overlay" id="modal-cal">
   <div class="modal">
     <h3>📅 Zum Kalender hinzufügen?</h3>
@@ -808,47 +447,140 @@ body {
   </div>
 </div>
 
+<!-- ERROR TOAST -->
+<div class="toast" id="toast"></div>
+
 <script>
-let fahrten = JSON.parse(localStorage.getItem('rikscha_v4') || '[]');
-let currentFilter = 'alle';
-let waTextToCopy = '';
-const PAGE_URL = window.location.href;
+// ── SUPABASE CONFIG ───────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://aryyaqnkukwvtvnemqhr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_vC8peOd16WlhpxW_R4bVoQ_xw9sAnV9';
+const TABLE = 'fahrten';
 
-function save() { localStorage.setItem('rikscha_v4', JSON.stringify(fahrten)); }
-
-// ── Refresh ──────────────────────────────────────────────────────────────────
-function doRefresh() { location.reload(); }
-
-// ── Auto-mark done ───────────────────────────────────────────────────────────
-function autoMarkDone() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  fahrten.forEach(f => {
-    if (f.status !== 'done') {
-      // Check primary datum or first date option
-      const checkDate = f.datum || (f.dateOptions && f.dateOptions[0] && f.dateOptions[0].date);
-      if (checkDate) {
-        const rd = new Date(checkDate); rd.setHours(0,0,0,0);
-        if ((today - rd) / 86400000 >= 1) f.status = 'done';
-      }
-    }
+async function sbFetch(path, options = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || 'return=representation',
+      ...options.headers
+    },
+    ...options
   });
-  save();
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
-// ── Form toggle ──────────────────────────────────────────────────────────────
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let fahrten = [];
+let currentFilter = 'alle';
+let waTextToCopy = '';
+let dateRowCount = 0;
+const PAGE_URL = window.location.href;
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.add('hidden');
+  setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 400);
+}
+
+// ── DB OPERATIONS ─────────────────────────────────────────────────────────────
+async function loadFahrten() {
+  try {
+    const data = await sbFetch(`${TABLE}?order=created_at.desc&select=*`);
+    fahrten = (data || []).map(row => ({
+      id:          row.id,
+      name:        row.name || '',
+      anzahl:      row.anzahl || 1,
+      tel:         row.tel || '',
+      hinweis:     row.hinweis || '',
+      datum:       row.datum || '',
+      uhrzeit:     row.uhrzeit || '',
+      dateOptions: row.date_options || [],
+      openDate:    row.open_date || false,
+      status:      row.status || 'frei',
+      fahrer:      row.fahrer || ''
+    }));
+    await syncDoneStatus();
+    render();
+    hideLoading();
+  } catch(e) {
+    hideLoading();
+    showToast('Verbindungsfehler. Bitte Seite neu laden.');
+    console.error(e);
+  }
+}
+
+async function syncDoneStatus() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const toMark = fahrten.filter(f => {
+    if (f.status === 'done') return false;
+    const checkDate = f.datum || (f.dateOptions && f.dateOptions[0] && f.dateOptions[0].date);
+    if (!checkDate) return false;
+    const rd = new Date(checkDate); rd.setHours(0,0,0,0);
+    return (today - rd) / 86400000 >= 1;
+  });
+  for (const f of toMark) {
+    await updateFahrtField(f.id, { status: 'done' });
+    f.status = 'done';
+  }
+}
+
+async function insertFahrt(fahrt) {
+  return await sbFetch(TABLE, {
+    method: 'POST',
+    body: JSON.stringify({
+      name:         fahrt.name,
+      anzahl:       fahrt.anzahl,
+      tel:          fahrt.tel,
+      hinweis:      fahrt.hinweis,
+      datum:        fahrt.datum,
+      uhrzeit:      fahrt.uhrzeit,
+      date_options: fahrt.dateOptions,
+      open_date:    fahrt.openDate,
+      status:       'frei',
+      fahrer:       ''
+    })
+  });
+}
+
+async function updateFahrtField(id, fields) {
+  return await sbFetch(`${TABLE}?id=eq.${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(fields),
+    prefer: 'return=minimal'
+  });
+}
+
+async function deleteFahrtDb(id) {
+  return await sbFetch(`${TABLE}?id=eq.${id}`, {
+    method: 'DELETE',
+    prefer: 'return=minimal'
+  });
+}
+
+// ── UI ACTIONS ────────────────────────────────────────────────────────────────
+function doRefresh() { location.reload(); }
+
 function toggleForm() {
   const body   = document.getElementById('form-body');
   const toggle = document.getElementById('form-toggle');
   const isOpen = body.classList.toggle('open');
   toggle.classList.toggle('open', isOpen);
-  // Init first date row if empty
-  if (isOpen && document.getElementById('date-options-list').children.length === 0) {
-    addDateOption();
-  }
+  if (isOpen && document.getElementById('date-options-list').children.length === 0) addDateOption();
 }
 
-// ── Date option rows ─────────────────────────────────────────────────────────
-let dateRowCount = 0;
 function addDateOption() {
   const list = document.getElementById('date-options-list');
   const id = ++dateRowCount;
@@ -856,11 +588,11 @@ function addDateOption() {
   div.className = 'date-option-row';
   div.id = 'date-row-' + id;
   div.innerHTML = `
-    <input type="date" id="date-d-${id}" placeholder="Datum">
+    <input type="date" id="date-d-${id}">
     <select id="date-t-${id}">
       <option value="">Uhrzeit offen</option>
-      <option value="vormittags">Vormittags</option>
-      <option value="nachmittags">Nachmittags</option>
+      <option value="Vormittags">Vormittags</option>
+      <option value="Nachmittags">Nachmittags</option>
       <option value="09:00">09:00 Uhr</option>
       <option value="10:00">10:00 Uhr</option>
       <option value="11:00">11:00 Uhr</option>
@@ -871,8 +603,7 @@ function addDateOption() {
       <option value="16:00">16:00 Uhr</option>
       <option value="17:00">17:00 Uhr</option>
     </select>
-    <button class="btn-remove-date" onclick="removeDateRow(${id})" title="Entfernen">×</button>
-  `;
+    <button class="btn-remove-date" onclick="removeDateRow(${id})">×</button>`;
   list.appendChild(div);
 }
 
@@ -885,9 +616,7 @@ function collectDateOptions() {
   const rows = document.querySelectorAll('#date-options-list .date-option-row');
   const opts = [];
   rows.forEach(row => {
-    const idMatch = row.id.match(/date-row-(\d+)/);
-    if (!idMatch) return;
-    const n = idMatch[1];
+    const n = row.id.replace('date-row-', '');
     const date = document.getElementById('date-d-' + n)?.value;
     const time = document.getElementById('date-t-' + n)?.value;
     if (date) opts.push({ date, time });
@@ -895,10 +624,9 @@ function collectDateOptions() {
   return opts;
 }
 
-// ── Add ──────────────────────────────────────────────────────────────────────
-function addFahrt() {
+async function addFahrt() {
   const name    = document.getElementById('inp-name').value.trim();
-  const anzahl  = document.getElementById('inp-anzahl').value;
+  const anzahl  = parseInt(document.getElementById('inp-anzahl').value);
   const tel     = document.getElementById('inp-tel').value.trim();
   const hinweis = document.getElementById('inp-hinweise').value.trim();
   const openDate= document.getElementById('inp-open-date').checked;
@@ -910,49 +638,124 @@ function addFahrt() {
     return;
   }
 
-  // Use first date option as primary datum for sorting/auto-done
-  const primaryDatum  = dateOptions.length > 0 ? dateOptions[0].date : '';
+  const primaryDatum   = dateOptions.length > 0 ? dateOptions[0].date : '';
   const primaryUhrzeit = dateOptions.length > 0 ? dateOptions[0].time : '';
 
-  const fahrt = {
-    id: Date.now(),
-    name, anzahl: parseInt(anzahl), tel, hinweis,
-    datum: primaryDatum,
-    uhrzeit: primaryUhrzeit,
-    dateOptions,
-    openDate,
-    status: 'frei',
-    fahrer: ''
-  };
+  const fahrt = { name, anzahl, tel, hinweis, datum: primaryDatum, uhrzeit: primaryUhrzeit, dateOptions, openDate };
 
-  fahrten.unshift(fahrt);
-  save();
-  render();
+  const btn = document.getElementById('btn-save-fahrt');
+  btn.disabled = true;
+  btn.textContent = 'Wird gespeichert…';
 
-  // Reset form
-  document.getElementById('inp-name').value = '';
-  document.getElementById('inp-tel').value = '';
-  document.getElementById('inp-hinweise').value = '';
-  document.getElementById('inp-open-date').checked = false;
-  document.getElementById('inp-anzahl').value = '1';
-  document.getElementById('date-options-list').innerHTML = '';
-  dateRowCount = 0;
-  addDateOption();
+  try {
+    const result = await insertFahrt(fahrt);
+    const newFahrt = { ...fahrt, id: result[0].id, status: 'frei', fahrer: '' };
+    fahrten.unshift(newFahrt);
+    render();
 
-  // Close form
-  document.getElementById('form-body').classList.remove('open');
-  document.getElementById('form-toggle').classList.remove('open');
+    // Reset form
+    document.getElementById('inp-name').value = '';
+    document.getElementById('inp-tel').value = '';
+    document.getElementById('inp-hinweise').value = '';
+    document.getElementById('inp-open-date').checked = false;
+    document.getElementById('inp-anzahl').value = '1';
+    document.getElementById('date-options-list').innerHTML = '';
+    dateRowCount = 0;
+    addDateOption();
+    document.getElementById('form-body').classList.remove('open');
+    document.getElementById('form-toggle').classList.remove('open');
 
-  // Show WhatsApp share modal
-  showWaModal(fahrt);
+    showWaModal(newFahrt);
+  } catch(e) {
+    showToast('Fehler beim Speichern. Bitte erneut versuchen.');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Fahrt speichern';
+  }
 }
 
-// ── WhatsApp share ───────────────────────────────────────────────────────────
+async function takeFahrt(id) {
+  const input  = document.getElementById('fahrer-' + id);
+  const fahrer = input ? input.value.trim() : '';
+  if (!fahrer) { alert('Bitte deinen Namen eingeben, bevor du die Fahrt übernimmst.'); return; }
+
+  const btn = document.querySelector(`button[onclick="takeFahrt(${id})"]`);
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  try {
+    await updateFahrtField(id, { status: 'vergeben', fahrer });
+    const f = fahrten.find(f => f.id === id);
+    if (f) { f.status = 'vergeben'; f.fahrer = fahrer; }
+    render();
+    showCalModal(fahrten.find(f => f.id === id));
+  } catch(e) {
+    showToast('Fehler. Bitte erneut versuchen.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Fahrt übernehmen'; }
+  }
+}
+
+async function releaseFahrt(id) {
+  if (!confirm('Fahrt freigeben, damit ein anderer Fahrer sie übernehmen kann?')) return;
+  try {
+    await updateFahrtField(id, { status: 'frei', fahrer: '' });
+    const f = fahrten.find(f => f.id === id);
+    if (f) { f.status = 'frei'; f.fahrer = ''; }
+    render();
+  } catch(e) { showToast('Fehler. Bitte erneut versuchen.'); }
+}
+
+async function deleteFahrt(id) {
+  if (!confirm('Fahrt endgültig löschen?')) return;
+  try {
+    await deleteFahrtDb(id);
+    fahrten = fahrten.filter(f => f.id !== id);
+    render();
+  } catch(e) { showToast('Fehler beim Löschen. Bitte erneut versuchen.'); }
+}
+
+function toggleEdit(id) {
+  const ef  = document.getElementById('edit-form-' + id);
+  const btn = document.getElementById('edit-btn-' + id);
+  if (!ef) return;
+  const isOpen = ef.classList.toggle('open');
+  if (btn) btn.textContent = isOpen ? 'Abbrechen' : 'Bearbeiten';
+}
+
+function openSaveModal(id) {
+  document.getElementById('modal-confirm-btn').onclick = () => confirmSave(id);
+  document.getElementById('modal-save').classList.add('open');
+}
+
+async function confirmSave(id) {
+  closeModal('modal-save');
+  const f = fahrten.find(f => f.id === id);
+  if (!f) return;
+
+  const updates = {
+    name:    document.getElementById('edit-name-'    + id).value.trim() || f.name,
+    tel:     document.getElementById('edit-tel-'     + id).value.trim(),
+    datum:   document.getElementById('edit-datum-'   + id).value,
+    uhrzeit: document.getElementById('edit-uhrzeit-' + id).value,
+    hinweis: document.getElementById('edit-hinweis-' + id).value.trim(),
+    status:  document.getElementById('edit-status-'  + id).value,
+    fahrer:  document.getElementById('edit-fahrer-'  + id).value.trim()
+  };
+
+  try {
+    await updateFahrtField(id, updates);
+    Object.assign(f, updates);
+    render();
+  } catch(e) { showToast('Fehler beim Speichern der Änderungen.'); }
+}
+
+function closeModal(mid) { document.getElementById(mid).classList.remove('open'); }
+
+// ── WHATSAPP ──────────────────────────────────────────────────────────────────
 function showWaModal(fahrt) {
-  const dateLines = fahrt.dateOptions.map(o =>
+  const dateLines = (fahrt.dateOptions || []).map(o =>
     `   📅 ${formatDate(o.date)}${o.time ? ' — ' + o.time : ''}`
   ).join('\n');
-
   const openLine = fahrt.openDate ? '\n   🗓 Flexibles Datum' : '';
 
   const text = `🚲 *Neue Rikscha-Fahrt*
@@ -976,40 +779,25 @@ function copyWaText() {
   navigator.clipboard.writeText(waTextToCopy).then(() => {
     document.getElementById('copy-confirm').classList.add('show');
   }).catch(() => {
-    // fallback
     const ta = document.createElement('textarea');
     ta.value = waTextToCopy;
-    document.body.appendChild(ta);
-    ta.select();
+    document.body.appendChild(ta); ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
     document.getElementById('copy-confirm').classList.add('show');
   });
 }
 
-// ── Take ride ────────────────────────────────────────────────────────────────
-function takeFahrt(id) {
-  const input  = document.getElementById('fahrer-' + id);
-  const fahrer = input ? input.value.trim() : '';
-  if (!fahrer) { alert('Bitte deinen Namen eingeben, bevor du die Fahrt übernimmst.'); return; }
-  const f = fahrten.find(f => f.id === id);
-  if (!f) return;
-  f.status = 'vergeben';
-  f.fahrer = fahrer;
-  save(); render();
-  showCalModal(f);
-}
-
-// ── Calendar ─────────────────────────────────────────────────────────────────
+// ── CALENDAR ──────────────────────────────────────────────────────────────────
 function showCalModal(fahrt) {
-  const firstDate = fahrt.dateOptions && fahrt.dateOptions[0] ? fahrt.dateOptions[0] : { date: fahrt.datum, time: fahrt.uhrzeit };
+  if (!fahrt) return;
+  const firstDate = (fahrt.dateOptions && fahrt.dateOptions[0]) ? fahrt.dateOptions[0] : { date: fahrt.datum, time: fahrt.uhrzeit };
   document.getElementById('cal-preview').innerHTML = `
     <strong>🚲 Rikscha-Fahrt: ${fahrt.name}</strong>
     📅 ${formatDate(firstDate.date)}${firstDate.time ? ' &nbsp;🕐 ' + firstDate.time : ''}
     ${fahrt.tel ? '<br>📞 ' + fahrt.tel : ''}
     ${fahrt.hinweis ? '<br>📝 ' + fahrt.hinweis : ''}
-    <br>🚗 Fahrer: ${fahrt.fahrer}
-  `;
+    <br>🚗 Fahrer: ${fahrt.fahrer}`;
   document.getElementById('cal-confirm-btn').onclick = () => addToCalendar(fahrt, firstDate);
   document.getElementById('modal-cal').classList.add('open');
 }
@@ -1018,70 +806,26 @@ function addToCalendar(fahrt, firstDate) {
   closeModal('modal-cal');
   try {
     const dt = (firstDate.date || '').replace(/-/g,'');
-    if (!dt) { alert('Kein Datum für Kalender vorhanden.'); return; }
+    if (!dt) { alert('Kein Datum vorhanden.'); return; }
     const tRaw = (firstDate.time && firstDate.time.includes(':')) ? firstDate.time : '09:00';
     const [hh, mm] = tRaw.split(':');
-    const startTime = hh.padStart(2,'0') + mm.padStart(2,'0') + '00';
-    const endHour = String(parseInt(hh)+1).padStart(2,'0') + mm.padStart(2,'0') + '00';
-    const ics = [
-      'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Rikscha Team//DE',
-      'BEGIN:VEVENT',
-      `DTSTART:${dt}T${startTime}`,
-      `DTEND:${dt}T${endHour}`,
+    const start = hh.padStart(2,'0') + mm.padStart(2,'0') + '00';
+    const end   = String(parseInt(hh)+1).padStart(2,'0') + mm.padStart(2,'0') + '00';
+    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Rikscha//DE','BEGIN:VEVENT',
+      `DTSTART:${dt}T${start}`,`DTEND:${dt}T${end}`,
       `SUMMARY:Rikscha-Fahrt: ${fahrt.name}`,
-      `DESCRIPTION:Fahrgast: ${fahrt.name}\\nPersonen: ${fahrt.anzahl}\\nTelefon: ${fahrt.tel}\\nHinweise: ${fahrt.hinweis}\\nFahrer: ${fahrt.fahrer}`,
-      `LOCATION:${fahrt.hinweis}`,
-      'END:VEVENT','END:VCALENDAR'
-    ].join('\r\n');
+      `DESCRIPTION:Fahrgast: ${fahrt.name}\\nPersonen: ${fahrt.anzahl}\\nTel: ${fahrt.tel}\\nHinweise: ${fahrt.hinweis}\\nFahrer: ${fahrt.fahrer}`,
+      `LOCATION:${fahrt.hinweis}`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
     const blob = new Blob([ics], { type:'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url; a.download = `rikscha-${dt}.ics`;
     document.body.appendChild(a); a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a); URL.revokeObjectURL(url);
   } catch(e) { alert('Kalender-Datei konnte nicht erstellt werden.'); }
 }
 
-// ── Release / Delete ─────────────────────────────────────────────────────────
-function releaseFahrt(id) {
-  if (!confirm('Fahrt freigeben, damit ein anderer Fahrer sie übernehmen kann?')) return;
-  const f = fahrten.find(f => f.id === id);
-  if (f) { f.status = 'frei'; f.fahrer = ''; save(); render(); }
-}
-function deleteFahrt(id) {
-  if (!confirm('Fahrt endgültig löschen?')) return;
-  fahrten = fahrten.filter(f => f.id !== id);
-  save(); render();
-}
-
-// ── Edit ─────────────────────────────────────────────────────────────────────
-function toggleEdit(id) {
-  const ef  = document.getElementById('edit-form-' + id);
-  const btn = document.getElementById('edit-btn-' + id);
-  if (!ef) return;
-  const isOpen = ef.classList.toggle('open');
-  if (btn) btn.textContent = isOpen ? 'Abbrechen' : 'Bearbeiten';
-}
-function openSaveModal(id) {
-  document.getElementById('modal-confirm-btn').onclick = () => confirmSave(id);
-  document.getElementById('modal-save').classList.add('open');
-}
-function closeModal(mid) { document.getElementById(mid).classList.remove('open'); }
-function confirmSave(id) {
-  const f = fahrten.find(f => f.id === id);
-  if (!f) { closeModal('modal-save'); return; }
-  f.name    = document.getElementById('edit-name-'    + id).value.trim() || f.name;
-  f.tel     = document.getElementById('edit-tel-'     + id).value.trim();
-  f.datum   = document.getElementById('edit-datum-'   + id).value;
-  f.uhrzeit = document.getElementById('edit-uhrzeit-' + id).value;
-  f.hinweis = document.getElementById('edit-hinweis-' + id).value.trim();
-  f.status  = document.getElementById('edit-status-'  + id).value;
-  f.fahrer  = document.getElementById('edit-fahrer-'  + id).value.trim();
-  save(); closeModal('modal-save'); render();
-}
-
-// ── Filter ───────────────────────────────────────────────────────────────────
+// ── FILTER / SORT / RENDER ────────────────────────────────────────────────────
 function setFilter(f, el, cls) {
   currentFilter = f;
   ['alle','frei','vergeben','done'].forEach(k => {
@@ -1092,7 +836,6 @@ function setFilter(f, el, cls) {
   render();
 }
 
-// ── Sort ─────────────────────────────────────────────────────────────────────
 function sortFahrten(list) {
   const v = document.getElementById('sort-select').value;
   const order = { frei:0, vergeben:1, done:2 };
@@ -1105,7 +848,6 @@ function sortFahrten(list) {
   });
 }
 
-// ── Format helpers ───────────────────────────────────────────────────────────
 function formatDate(ds) {
   if (!ds) return 'Datum offen';
   const [y,m,d] = ds.split('-');
@@ -1116,9 +858,7 @@ function badgeLabel(s) {
   return s==='frei' ? '🟡 Frei' : s==='vergeben' ? '🟢 Vergeben' : '⬜ Erledigt';
 }
 
-// ── Render ───────────────────────────────────────────────────────────────────
 function render() {
-  autoMarkDone();
   const alle     = fahrten.length;
   const frei     = fahrten.filter(f => f.status==='frei').length;
   const vergeben = fahrten.filter(f => f.status==='vergeben').length;
@@ -1133,7 +873,7 @@ function render() {
   const list = document.getElementById('trips-list');
 
   if (visible.length === 0) {
-    const msgs = { alle:'Noch keine Fahrten eingetragen. Oben erste Fahrt hinzufügen.', frei:'Keine freien Fahrten gerade.', vergeben:'Keine vergebenen Fahrten.', done:'Noch keine erledigten Fahrten.' };
+    const msgs = { alle:'Noch keine Fahrten. Oben erste Fahrt hinzufügen.', frei:'Keine freien Fahrten gerade.', vergeben:'Keine vergebenen Fahrten.', done:'Noch keine erledigten Fahrten.' };
     list.innerHTML = `<div class="empty"><div class="empty-icon">🚲</div><p>${msgs[currentFilter]}</p></div>`;
     return;
   }
@@ -1142,16 +882,10 @@ function render() {
     const isDone = fahrt.status==='done';
     const isFrei = fahrt.status==='frei';
 
-    // Date pills
-    let datePills = '';
-    if (fahrt.dateOptions && fahrt.dateOptions.length > 0) {
-      datePills = fahrt.dateOptions.map(o =>
-        `<span class="date-pill">${formatDate(o.date)}${o.time ? ' · ' + o.time : ''}</span>`
-      ).join('');
-    }
-    if (fahrt.openDate) {
-      datePills += `<span class="date-pill open">🗓 Flexibles Datum</span>`;
-    }
+    let datePills = (fahrt.dateOptions||[]).map(o =>
+      `<span class="date-pill">${formatDate(o.date)}${o.time ? ' · ' + o.time : ''}</span>`
+    ).join('');
+    if (fahrt.openDate) datePills += `<span class="date-pill open">🗓 Flexibles Datum</span>`;
 
     const anzahlText = fahrt.anzahl > 1 ? `👥 ${fahrt.anzahl} Personen` : `👤 1 Person`;
 
@@ -1206,22 +940,9 @@ function render() {
   }).join('');
 }
 
-// ── Demo data ─────────────────────────────────────────────────────────────────
-if (fahrten.length === 0) {
-  const today = new Date();
-  const fmt = d => d.toISOString().split('T')[0];
-  const d = n => { const x = new Date(today); x.setDate(today.getDate()+n); return fmt(x); };
-  fahrten = [
-    { id:1, name:'Frau Schmidt',  anzahl:1, tel:'0151 11111111', datum:d(-2), uhrzeit:'10:00', dateOptions:[{date:d(-2),time:'10:00'}], openDate:false, hinweis:'Marktplatz, Rollstuhl', status:'done',     fahrer:'Klaus' },
-    { id:2, name:'Herr Wagner',   anzahl:1, tel:'0152 22222222', datum:d(1),  uhrzeit:'',      dateOptions:[{date:d(1),time:'nachmittags'},{date:d(2),time:'nachmittags'}], openDate:false, hinweis:'Vor der Apotheke', status:'frei', fahrer:'' },
-    { id:3, name:'Familie Bauer', anzahl:2, tel:'0153 33333333', datum:d(2),  uhrzeit:'14:00', dateOptions:[{date:d(2),time:'14:00'}], openDate:true, hinweis:'Stadtpark, 2 Personen', status:'frei', fahrer:'' },
-    { id:4, name:'Frau Müller',   anzahl:1, tel:'0154 44444444', datum:d(0),  uhrzeit:'09:30', dateOptions:[{date:d(0),time:'09:30'}], openDate:false, hinweis:'Hauptbahnhof Ausgang Süd', status:'vergeben', fahrer:'Maria' },
-  ];
-  save();
-}
-
-// Init
+// ── INIT ──────────────────────────────────────────────────────────────────────
 setFilter('alle', document.getElementById('stat-alle'), 'alle');
+loadFahrten();
 </script>
 </body>
 </html>
