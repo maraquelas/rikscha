@@ -308,7 +308,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   <div class="refresh-banner" id="refresh-banner">
     <div class="refresh-banner-text">
       <strong>🔄 Zuerst aktualisieren!</strong>
-      <span>Bitte vor der Nutzung aktualisieren, um die neusten Fahrten zu sehen.</span>
+      <span>Tippe auf "Aktualisieren" um die neusten Fahrten zu laden.</span>
     </div>
     <button class="btn-refresh" onclick="doRefresh()">Aktualisieren</button>
   </div>
@@ -592,19 +592,17 @@ async function deleteFahrtDb(id) {
 }
 
 // ── UI ACTIONS ────────────────────────────────────────────────────────────────
-function doRefresh() {
+async function doRefresh() {
   sessionStorage.setItem('refreshed', '1');
   const banner = document.getElementById('refresh-banner');
+  const btn = document.querySelector('.btn-refresh');
+  if (btn) {
+    btn.textContent = '⏳ Wird geladen…';
+    btn.style.animation = 'none';
+    btn.disabled = true;
+  }
+  await loadFahrten();
   if (banner) banner.style.display = 'none';
-  loadFahrten();
-}
-
-// Hide banner immediately if already refreshed this session
-if (sessionStorage.getItem('refreshed')) {
-  document.addEventListener('DOMContentLoaded', () => {
-    const banner = document.getElementById('refresh-banner');
-    if (banner) banner.style.display = 'none';
-  });
 }
 
 function toggleForm() {
