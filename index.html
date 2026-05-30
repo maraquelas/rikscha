@@ -590,9 +590,18 @@ async function deleteFahrtDb(id) {
 
 // ── UI ACTIONS ────────────────────────────────────────────────────────────────
 function doRefresh() {
+  sessionStorage.setItem('refreshed', '1');
   const banner = document.getElementById('refresh-banner');
   if (banner) banner.style.display = 'none';
   loadFahrten();
+}
+
+// Hide banner immediately if already refreshed this session
+if (sessionStorage.getItem('refreshed')) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const banner = document.getElementById('refresh-banner');
+    if (banner) banner.style.display = 'none';
+  });
 }
 
 function toggleForm() {
@@ -1030,6 +1039,10 @@ function render() {
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+if (sessionStorage.getItem('refreshed')) {
+  const banner = document.getElementById('refresh-banner');
+  if (banner) banner.style.display = 'none';
+}
 setFilter('alle', document.getElementById('stat-alle'), 'alle');
 loadFahrten();
 </script>
