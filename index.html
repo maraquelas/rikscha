@@ -305,7 +305,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 <div class="app">
 
-  <div class="refresh-banner">
+  <div class="refresh-banner" id="refresh-banner">
     <div class="refresh-banner-text">
       <strong>🔄 Zuerst aktualisieren!</strong>
       <span>Bitte vor der Nutzung aktualisieren, um die neusten Fahrten zu sehen.</span>
@@ -331,13 +331,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="text" id="inp-name" placeholder="z.B. Frau Müller">
         </div>
         <div class="form-field">
-          <label>Anzahl Fahrgäste (max. 4)</label>
+          <label>Anzahl Fahrgäste (max. 2)</label>
           <select id="inp-anzahl">
             <option value="1">1 Person</option>
             <option value="2">2 Personen</option>
-            <option value="3">3 Personen</option>
-            <option value="4">4 Personen</option>
-            <option value="Gruppe">Gruppefahrten</option>
           </select>
         </div>
         <div class="form-field">
@@ -592,7 +589,11 @@ async function deleteFahrtDb(id) {
 }
 
 // ── UI ACTIONS ────────────────────────────────────────────────────────────────
-function doRefresh() { location.reload(); }
+function doRefresh() {
+  const banner = document.getElementById('refresh-banner');
+  if (banner) banner.style.display = 'none';
+  loadFahrten();
+}
 
 function toggleForm() {
   const body   = document.getElementById('form-body');
@@ -768,19 +769,46 @@ async function confirmSave(id) {
   const f = fahrten.find(f => f.id === id);
   if (!f) return;
 
+  const newAnzahl  = parseInt(document.getElementById('edit-anzahl-' + id)?.value) || f.anzahl;
+  const newStatus  = document.getElementById('edit-status-' + id).value;
+  const newFahrer  = document.getElementById('edit-fahrer-' + id).value.trim();
+  const newOpenDate = document.getElementById('edit-open-date-' + id)?.checked || false;
+  const newDatum1  = document.getElementById('edit-datum1-' + id)?.value || '';
+  const newUhr1    = document.getElementById('edit-uhr1-' + id)?.value || '';
+  const newDatum2  = document.getElementById('edit-datum2-' + id)?.value || '';
+  const newUhr2    = document.getElementById('edit-uhr2-' + id)?.value || '';
+  const newDatum3  = document.getElementById('edit-datum3-' + id)?.value || '';
+  const newUhr3    = document.getElementById('edit-uhr3-' + id)?.value || '';
+
   const updates = {
-    name:    document.getElementById('edit-name-'    + id).value.trim() || f.name,
-    tel:     document.getElementById('edit-tel-'     + id).value.trim(),
-    datum:   document.getElementById('edit-datum-'   + id).value,
-    uhrzeit: document.getElementById('edit-uhrzeit-' + id).value,
-    hinweis: document.getElementById('edit-hinweis-' + id).value.trim(),
-    status:  document.getElementById('edit-status-'  + id).value,
-    fahrer:  document.getElementById('edit-fahrer-'  + id).value.trim()
+    name:      document.getElementById('edit-name-'    + id).value.trim() || f.name,
+    tel:       document.getElementById('edit-tel-'     + id).value.trim(),
+    hinweis:   document.getElementById('edit-hinweis-' + id).value.trim(),
+    anzahl:    newAnzahl,
+    status:    newStatus,
+    fahrer:    newFahrer,
+    open_date: newOpenDate,
+    datum:     newDatum1,
+    uhrzeit:   newUhr1,
+    datum_1:   newDatum1,
+    uhrzeit_1: newUhr1,
+    datum_2:   newDatum2,
+    uhrzeit_2: newUhr2,
+    datum_3:   newDatum3,
+    uhrzeit_3: newUhr3,
   };
 
   try {
     await updateFahrtField(id, updates);
+    // Update local state fully so UI reflects changes immediately
     Object.assign(f, updates);
+    f.openDate = newOpenDate;
+    f.anzahl   = newAnzahl;
+    // Rebuild dateOptions for card display
+    f.dateOptions = [];
+    if (newDatum1) f.dateOptions.push({ date: newDatum1, time: newUhr1 });
+    if (newDatum2) f.dateOptions.push({ date: newDatum2, time: newUhr2 });
+    if (newDatum3) f.dateOptions.push({ date: newDatum3, time: newUhr3 });
     render();
   } catch(e) { showToast('Fehler beim Speichern der Änderungen.'); }
 }
@@ -929,17 +957,24 @@ function render() {
 
     const actionsHtml = isDone
       ? `<span style="font-size:12.5px;color:var(--hint);font-style:italic;">Automatisch als erledigt markiert</span>
-         <button class="btn-sm edit" id="edit-btn-${fahrt.id}" onclick="toggleEdit(${fahrt.id})">Bearbeiten</button>
-         <button class="btn-sm danger" onclick="deleteFahrt(${fahrt.id})">Löschen</button>`
+         <button class="btn-sm edit" id="edit-btn-${fahrt.id}" onclick="toggleEdit(${fahrt.id})">Bearbeiten</button>`
       : isFrei
       ? `<input class="assign-input" id="fahrer-${fahrt.id}" type="text" placeholder="Deinen Namen eingeben">
          <button class="btn-take" onclick="takeFahrt(${fahrt.id})">Fahrt übernehmen</button>
-         <button class="btn-sm edit" id="edit-btn-${fahrt.id}" onclick="toggleEdit(${fahrt.id})">Bearbeiten</button>
-         <button class="btn-sm danger" onclick="deleteFahrt(${fahrt.id})">Löschen</button>`
+         <button class="btn-sm edit" id="edit-btn-${fahrt.id}" onclick="toggleEdit(${fahrt.id})">Bearbeiten</button>`
       : `<div class="driver-info">Fahrer: <strong>${fahrt.fahrer}</strong></div>
          <button class="btn-sm" onclick="releaseFahrt(${fahrt.id})">Freigeben</button>
-         <button class="btn-sm edit" id="edit-btn-${fahrt.id}" onclick="toggleEdit(${fahrt.id})">Bearbeiten</button>
-         <button class="btn-sm danger" onclick="deleteFahrt(${fahrt.id})">Löschen</button>`;
+         <button class="btn-sm edit" id="edit-btn-${fahrt.id}" onclick="toggleEdit(${fahrt.id})">Bearbeiten</button>`;
+
+    const timeOpts = `<option value="">Uhrzeit offen</option>
+      <option value="Vormittags">Vormittags</option><option value="Nachmittags">Nachmittags</option>
+      <option value="09:00">09:00</option><option value="10:00">10:00</option>
+      <option value="11:00">11:00</option><option value="12:00">12:00</option>
+      <option value="13:00">13:00</option><option value="14:00">14:00</option>
+      <option value="15:00">15:00</option><option value="16:00">16:00</option>
+      <option value="17:00">17:00</option>`;
+
+    const selTime = (val) => timeOpts.replace(`value="${val}"`, `value="${val}" selected`);
 
     return `
     <div class="trip-card ${fahrt.status}">
@@ -958,8 +993,12 @@ function render() {
         <div class="edit-grid">
           <div class="edit-field"><label>Name</label><input type="text" id="edit-name-${fahrt.id}" value="${fahrt.name}"></div>
           <div class="edit-field"><label>Telefon</label><input type="text" id="edit-tel-${fahrt.id}" value="${fahrt.tel||''}"></div>
-          <div class="edit-field"><label>Datum (Haupttermin)</label><input type="date" id="edit-datum-${fahrt.id}" value="${fahrt.datum||''}"></div>
-          <div class="edit-field"><label>Uhrzeit</label><input type="time" id="edit-uhrzeit-${fahrt.id}" value="${fahrt.uhrzeit||''}"></div>
+          <div class="edit-field"><label>Anzahl Personen</label>
+            <select id="edit-anzahl-${fahrt.id}">
+              <option value="1" ${fahrt.anzahl===1?'selected':''}>1 Person</option>
+              <option value="2" ${fahrt.anzahl===2?'selected':''}>2 Personen</option>
+            </select>
+          </div>
           <div class="edit-field"><label>Status</label>
             <select id="edit-status-${fahrt.id}">
               <option value="frei" ${fahrt.status==='frei'?'selected':''}>Frei</option>
@@ -969,8 +1008,19 @@ function render() {
           </div>
           <div class="edit-field"><label>Fahrer</label><input type="text" id="edit-fahrer-${fahrt.id}" value="${fahrt.fahrer||''}" placeholder="Name des Fahrers"></div>
           <div class="edit-field full"><label>Hinweise</label><input type="text" id="edit-hinweis-${fahrt.id}" value="${fahrt.hinweis||''}"></div>
+          <div class="edit-field"><label>Termin 1 — Datum</label><input type="date" id="edit-datum1-${fahrt.id}" value="${fahrt.datum_1||fahrt.datum||''}"></div>
+          <div class="edit-field"><label>Termin 1 — Uhrzeit</label><select id="edit-uhr1-${fahrt.id}">${selTime(fahrt.uhrzeit_1||fahrt.uhrzeit||'')}</select></div>
+          <div class="edit-field"><label>Termin 2 — Datum</label><input type="date" id="edit-datum2-${fahrt.id}" value="${fahrt.datum_2||''}"></div>
+          <div class="edit-field"><label>Termin 2 — Uhrzeit</label><select id="edit-uhr2-${fahrt.id}">${selTime(fahrt.uhrzeit_2||'')}</select></div>
+          <div class="edit-field"><label>Termin 3 — Datum</label><input type="date" id="edit-datum3-${fahrt.id}" value="${fahrt.datum_3||''}"></div>
+          <div class="edit-field"><label>Termin 3 — Uhrzeit</label><select id="edit-uhr3-${fahrt.id}">${selTime(fahrt.uhrzeit_3||'')}</select></div>
+          <div class="edit-field full" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--frei-bg);border:1px solid var(--frei-border);border-radius:8px;">
+            <input type="checkbox" id="edit-open-date-${fahrt.id}" ${fahrt.openDate?'checked':''} style="width:17px;height:17px;accent-color:var(--frei);">
+            <label for="edit-open-date-${fahrt.id}" style="font-size:13px;cursor:pointer;color:var(--frei);">Flexibles Datum (Termin noch offen)</label>
+          </div>
         </div>
         <div class="edit-actions">
+          <button class="btn-sm danger" onclick="deleteFahrt(${fahrt.id})">Löschen</button>
           <button class="btn-sm" onclick="toggleEdit(${fahrt.id})">Abbrechen</button>
           <button class="btn-save" onclick="openSaveModal(${fahrt.id})">Änderungen speichern</button>
         </div>
