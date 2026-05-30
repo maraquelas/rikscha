@@ -331,10 +331,13 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
           <input type="text" id="inp-name" placeholder="z.B. Frau Müller">
         </div>
         <div class="form-field">
-          <label>Anzahl Fahrgäste (max. 2)</label>
+          <label>Anzahl Fahrgäste</label>
           <select id="inp-anzahl">
             <option value="1">1 Person</option>
             <option value="2">2 Personen</option>
+            <option value="3">3 Personen</option>
+            <option value="4">4 Personen</option>
+            <option value="5">Gruppenfahrt</option>
           </select>
         </div>
         <div class="form-field">
@@ -962,7 +965,7 @@ function render() {
       .join('');
     if (fahrt.openDate) datePills += `<span class="date-pill open">🗓 Flexibles Datum</span>`;
 
-    const anzahlText = fahrt.anzahl > 1 ? `👥 ${fahrt.anzahl} Personen` : `👤 1 Person`;
+    const anzahlText = fahrt.anzahl === 5 ? '👥 Gruppenfahrt' : fahrt.anzahl > 1 ? `👥 ${fahrt.anzahl} Personen` : `👤 1 Person`;
 
     const actionsHtml = isDone
       ? `<span style="font-size:12.5px;color:var(--hint);font-style:italic;">Automatisch als erledigt markiert</span>
@@ -1006,6 +1009,9 @@ function render() {
             <select id="edit-anzahl-${fahrt.id}">
               <option value="1" ${fahrt.anzahl===1?'selected':''}>1 Person</option>
               <option value="2" ${fahrt.anzahl===2?'selected':''}>2 Personen</option>
+              <option value="3" ${fahrt.anzahl===3?'selected':''}>3 Personen</option>
+              <option value="4" ${fahrt.anzahl===4?'selected':''}>4 Personen</option>
+              <option value="5" ${fahrt.anzahl===5?'selected':''}>Gruppenfahrt</option>
             </select>
           </div>
           <div class="edit-field"><label>Status</label>
